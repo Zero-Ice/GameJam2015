@@ -4,18 +4,30 @@ using System.Collections.Generic;
 
 public class Building : MonoBehaviour {
 
-	public string buildingName;
+	public 	enum BuildingType
+	{
+		Start,
+		Company,
+		RandomEvent,
+		Tax,
+		FairyGodMother,
+		Jail,
+	};
+
+	public string buildingName = "";
 	public int buildingIndex;
-	public float stockPrice;
+	public float stockPrice = 5;
 	public float finalStockPrice;
-	public float multiplier;
+	public float multiplier = 1;
 
 	List<Debt> debtors;
 
+	public BuildingType type;
 
 	// Use this for initialization
 	void Start () {
 		debtors = new List<Debt>();
+		finalStockPrice = stockPrice * multiplier;
 	}
 	
 	// Update is called once per frame
@@ -32,11 +44,9 @@ public class Building : MonoBehaviour {
 			if(!x.UpdateTurn()){
 				// If player has enough stock to return to the building
 				if(x.player.stockDataList[buildingIndex].stocksBorrowed >= x.noStocksOwed) {
-					x.player.stockDataList[buildingIndex].stocksBorrowed -= x.noStocksOwed;
-					ClearDebtor(x);
+					x.player.ReturnStock(buildingIndex);
 				} else {
-					// If player fails to pay in stocks, pay money
-					x.player.money -= x.noStocksOwed * stockPrice;
+					x.player.ReturnStock(buildingIndex);
 				}
 			}
 		}
@@ -63,7 +73,7 @@ public class Debt : MonoBehaviour {
 	byte turns;
 	
 	public Debt(Player otherPlayer) {
-		turns = 5;
+		turns = 3;
 		this.player = otherPlayer;
 	}
 	
