@@ -8,21 +8,61 @@ public class Player : MonoBehaviour {
 
 	public float money;
 
-	public bool turn, done;
+	public bool turn, done, isJailed;
+
+	State playerState;
+
+	GameManager manager;
+
+	enum State
+	{
+		IDLE,
+		ROLLDICE,
+		BUYMENU, // buy 
+		SELLMENU,
+	};
 
 	// Use this for initialization
 	void Start () {
 		money = 200000;
 		turn = false;
 		done = false;
+		isJailed = false;
+
+		playerState = State.IDLE;
+
+		this.manager = GameObject.Find ("Game Manager").GetComponent<GameManager>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-	
+		
 	}
 	
 	public void UpdateTurn() {
+		switch (playerState) {
+		case State.IDLE:
+			RunIdle ();
+			break;
+		case State.ROLLDICE:
+			RunRollDice();
+			break;
+		case State.BUYMENU:
+			manager.RunBuyMenu();
+			break;
+		case State.SELLMENU:
+			manager.RunSellMenu();
+			break;
+		}
+	}
+
+	// Wait for player to roll dice
+	void RunIdle(){
+	
+	}
+
+	// Wait for dice to roll finish and check which block player lands on
+	void RunRollDice(){
 
 	}
 
