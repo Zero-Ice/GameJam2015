@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
+	[SerializeField] GameObject market;
+	[SerializeField] GameObject buyMenu;
 	[SerializeField] float[] stockPrice;
 	[SerializeField] float[] multiplier;
 
@@ -14,8 +16,8 @@ public class GameManager : MonoBehaviour {
 	public int noPlayers;
 	public int currentPlayerIndex;
 
-	public List<Building> buildingList;
-	public List<Player> playerList;
+	public List<Building> buildingList = null;
+	public List<Player> playerList = null;
 
 	bool showBuyMenu, showSellMenu;
 
@@ -25,20 +27,27 @@ public class GameManager : MonoBehaviour {
 		turnIndex = 0;
 		playerTurnTime = 30;
 		currentPlayerIndex = 0;
-
-		playerList = new List<Player> (noPlayers);
 		noPlayers = 2;
-		for (int i = 0; i < noPlayers; i++) {
-			playerList.Add(new Player());
+
+		buildingList = new List<Building> ();
+
+		for (int i = 0; i < 30; i++) {
+			Building building;
+			building = new Building();
+			building.type = Building.BuildingType.Company;
+			building.buildingIndex = i;
+			//buildingList[i].Init(multiplier[i], stockPrice[i]);
+			building.Init(1f, 5f);
+			buildingList.Add(building);
 		}
 
-		buildingList = new List<Building> (30);
+		playerList = new List<Player> ();
 
-		for (int i = 0; i < 29; i++) {
-			buildingList[i] = new Building();
-			buildingList[i].type = Building.BuildingType.Company;
-			buildingList[i].buildingIndex = i;
-			buildingList[i].Init(multiplier[i], stockPrice[i]);
+		for (int i = 0; i < noPlayers; i++) {
+			Player player = new Player();
+			player.Init();
+			playerList.Add(player);
+			Debug.Log (playerList.Count);
 		}
 
 		buildingList [0].type = Building.BuildingType.Start;
@@ -49,6 +58,7 @@ public class GameManager : MonoBehaviour {
 		buildingList [26].type = Building.BuildingType.RandomEvent;
 
 		int playerStart = Random.Range (0, noPlayers);
+		currentPlayerIndex = playerStart;
 
 		playerList [playerStart].turn = true;
 
@@ -57,8 +67,19 @@ public class GameManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (showSellMenu) {
+			market.SetActive (true);
+		} else {
+			market.SetActive(false);
+		}
+		if (showBuyMenu) {
+			buyMenu.SetActive (true);
+		} else {
+			buyMenu.SetActive(false);
+		}
 		// Current player
-		Player player;
+
+		Player player;	
 		player = playerList [currentPlayerIndex];
 
 		playerTurnTime -= Time.deltaTime;
@@ -70,20 +91,27 @@ public class GameManager : MonoBehaviour {
 			player.End();
 			// Go to next player
 			++currentPlayerIndex;
-			if(currentPlayerIndex > noPlayers) {
+
+			if(currentPlayerIndex >= noPlayers) {
 				currentPlayerIndex = 0;
 			}
+
 			// Set new current player
 			player = playerList [currentPlayerIndex];
 		}
 
+		Debug.Log (player.playerState.ToString ());
 		// Update current player's turn
 		player.UpdateTurn ();
 
 		// If player is done, start the next player's turn
 		if (player.done) {
+			showBuyMenu = false;
+			showSellMenu = false;
+
 			player.End();
 			++currentPlayerIndex;
+
 			// Turn increment
 			turnIndex += 1 / noPlayers;
 
@@ -99,7 +127,7 @@ public class GameManager : MonoBehaviour {
 				}
 			}
 
-			if(currentPlayerIndex > noPlayers) {
+			if(currentPlayerIndex >= noPlayers) {
 				currentPlayerIndex = 0;
 			}
 		}
@@ -154,5 +182,22 @@ public class GameManager : MonoBehaviour {
 		if (player.sellDone) {
 			player.done = true;
 		}
+	}
+
+	// UI Button Function to get out of idle state
+	public void RollDice(){
+		playerList [currentPlayerIndex].idleDone = true;
+	}
+
+	public void OpenMarket(){
+		showSellMenu = true;
+	}
+
+	public void CloseMarket(){
+		showSellMenu = false;
+	}
+
+	public void EndTurn(){
+		playerList [currentPlayerIndex].sellDone = true;
 	}
 }

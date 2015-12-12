@@ -12,8 +12,12 @@ public class Player : MonoBehaviour {
 		SELLMENU,
 	};
 
-	public List<StockData> stockDataList;
-	public List<Debt> debts;
+	public Player(){
+
+	}
+
+	public List<StockData> stockDataList = null;
+	public List<Debt> debts = null;
 
 	public float money;
 
@@ -28,24 +32,26 @@ public class Player : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+	}
+
+	public void Init(){
 		money = 200000;
 		turn = done = idleDone = buyDone = rollDiceDone = sellDone = isJailed = false;
-
+		
 		playerState = State.IDLE;
-
+		
 		currentBuildingIndex = 0;
-
-		stockDataList = new List<StockData> (30);
+		
+		stockDataList = new List<StockData> ();
 		debts = new List<Debt>();
-
+		
 		this.manager = GameObject.Find ("Game Manager").GetComponent<GameManager>();
-
+		
 		for (int i = 0; i < 30; i++) {
-			stockDataList.Add(new StockData());
-			stockDataList[i].building = manager.buildingList[i];
+			StockData stockData = new StockData();
+			stockData.building = manager.buildingList[i];
+			stockDataList.Add(stockData);
 		}
-
-
 	}
 
 	// Update is called once per frame
@@ -84,11 +90,6 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	// UI Button Function to get out of idle state
-	void RollDice(){
-		idleDone = true;
-	}
-
 	// Wait for dice to roll finish and check which block player lands on
 	void RunRollDice(){
 		// To Do: Link Dice UI
@@ -108,7 +109,11 @@ public class Player : MonoBehaviour {
 
 		// If player is not jailed, move the player
 		if (!isJailed) {
+			int prevIndex = currentBuildingIndex;
 			currentBuildingIndex += (diceroll1 + diceroll2);
+			if(currentBuildingIndex > 29){
+				currentBuildingIndex -= 29;
+			}
 
 			currentBuilding = manager.buildingList [currentBuildingIndex];
 			
@@ -209,6 +214,10 @@ public class Player : MonoBehaviour {
 }
 
 public class StockData : MonoBehaviour {
+
+	public StockData(){
+
+	}
 
 	public Building building = null;
 

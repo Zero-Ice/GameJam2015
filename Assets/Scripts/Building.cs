@@ -14,6 +14,10 @@ public class Building : MonoBehaviour {
 		Jail,
 	};
 
+	public Building(){
+
+	}
+
 	public string buildingName = "";
 	public int buildingIndex;
 	float stockPrice = 5;
@@ -56,6 +60,7 @@ public class Building : MonoBehaviour {
 			break;
 		case BuildingType.Tax:
 			Tax (player);
+			player.playerState = Player.State.SELLMENU;
 			break;
 		}
 	}
