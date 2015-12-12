@@ -9,10 +9,10 @@ public class GameManager : MonoBehaviour {
 	float playerTurnTime;
 
 	public int noPlayers;
-	int currentPlayerIndex;
+	public int currentPlayerIndex;
 
 	public List<Building> buildingList;
-	List<Player> playerList;
+	public List<Player> playerList;
 
 	bool showBuyMenu, showSellMenu;
 
@@ -26,7 +26,7 @@ public class GameManager : MonoBehaviour {
 		playerList = new List<Player> (noPlayers);
 		buildingList = new List<Building> (30);
 
-		for (int i = 0; i < 30; i++) {
+		for (int i = 0; i < 29; i++) {
 			buildingList[i] = new Building();
 			buildingList[i].type = Building.BuildingType.Company;
 			buildingList[i].buildingIndex = i;
@@ -105,14 +105,6 @@ public class GameManager : MonoBehaviour {
 		if (CheckIfPlayerCanBuy(player)) {
 			// Display the buy menu 
 			showBuyMenu = true;
-			// UI function here
-			//if(UI click buy ) {
-			//	playerList [currentPlayerIndex].BuyStock ();
-			//} else if (UI click borrow) {
-			//	playerList [currentPlayerIndex].BorrowStock ();
-			//} else if (UI click close) {
-			//	player.buyDone = true;
-			//}
 		} else { // If player is unable to buy or borrow
 			player.buyDone = true;
 		}
@@ -123,6 +115,16 @@ public class GameManager : MonoBehaviour {
 			player.buyDone = false;
 			player.playerState = Player.State.SELLMENU;
 		}
+	}
+
+	public void BuyButton(){
+		playerList [currentPlayerIndex].BuyStock ();
+		playerList [currentPlayerIndex].buyDone = true;
+	}
+
+	public void BorrowButton(){
+		playerList [currentPlayerIndex].BorrowStock ();
+		playerList [currentPlayerIndex].buyDone = true;
 	}
 
 	// Function to check that player has not bought or borrowed from that building
@@ -148,43 +150,5 @@ public class GameManager : MonoBehaviour {
 		if (player.sellDone) {
 			player.done = true;
 		}
-	}
-
-	void Jail(){
-		playerList [currentPlayerIndex].isJailed = true;
-	}
-
-	void Event(){
-		int eventNo;
-
-		eventNo = Random.Range (0, 3);
-
-		switch (eventNo) {
-		case 0:
-			Event1();
-			break;
-		case 1:
-			Event2 ();
-			break;
-		case 2:
-			Event3 ();
-			break;
-		}
-	}
-
-	void Event1(){
-
-	}
-
-	void Event2(){
-
-	}
-
-	void Event3(){
-
-	}
-
-	void Tax(){
-		playerList [currentPlayerIndex].money -= turn * 5000;
 	}
 }

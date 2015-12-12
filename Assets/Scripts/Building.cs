@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class Building : MonoBehaviour {
 
-	public 	enum BuildingType
+	public enum BuildingType
 	{
 		Start,
 		Company,
@@ -20,13 +20,10 @@ public class Building : MonoBehaviour {
 	public float finalStockPrice;
 	float multiplier = 1;
 
-	List<Debt> debtors;
-
 	public BuildingType type;
 
 	// Use this for initialization
 	void Start () {
-		debtors = new List<Debt>();
 		finalStockPrice = stockPrice * multiplier;
 	}
 	
@@ -35,63 +32,69 @@ public class Building : MonoBehaviour {
 
 	}
 
-	public void StockRandomChange(){
-		stockPrice *= Random.Range(0.5f, 1.6f);
-	}
+	public void Execute(Player player){
+		switch (type) {
+		case BuildingType.Company:
+			player.playerState = Player.State.BUYMENU;
+			break;
+		case BuildingType.RandomEvent:
+			Event ();
+			player.playerState = Player.State.SELLMENU;
+			break;
+		case BuildingType.Jail:
+			Jail (player);
+			player.playerState = Player.State.SELLMENU;
+			break;
+		case BuildingType.FairyGodMother:
+			FairyGodMother();
+			break;
 
-	public void AddDebtor(Player otherPlayer) {
-		debtors.Add(new Debt(otherPlayer));
-	}
-
-	public void UpdateDebtors() {
-		foreach (Debt x in debtors) {
-			if(!x.UpdateTurn()){
-				// If player has enough stock to return to the building
-				if(x.player.stockDataList[buildingIndex].stocksBorrowed >= x.noStocksOwed) {
-					x.player.ReturnStock(buildingIndex);
-				} else {
-					x.player.ReturnStock(buildingIndex);
-				}
-			}
 		}
 	}
 
-	public void ClearDebtor(Player otherPlayer) {
-		foreach (Debt x in debtors) {
-			if(x.player == otherPlayer) {
-				ClearDebtor(x);
-				break;
-			}
-		}
-	}
-
-	void ClearDebtor(Debt otherDebt) {
-		debtors.Remove (otherDebt);
-	}
-}
-
-public class Debt : MonoBehaviour {
-	
-	public Player player;
-	public float noStocksOwed;
-	byte turns;
-	
-	public Debt(Player otherPlayer) {
-		turns = 3;
-		this.player = otherPlayer;
+	void Jail(Player player){
+		player.isJailed = true;
 	}
 	
-	public bool UpdateTurn() {
-		--turns;
-		if (turns > 0)
-			return true;
-		else {
-			return false;
+	void Event(){
+		int eventNo;
+		
+		eventNo = Random.Range (0, 3);
+		
+		switch (eventNo) {
+		case 0:
+			Event1();
+			break;
+		case 1:
+			Event2 ();
+			break;
+		case 2:
+			Event3 ();
+			break;
 		}
 	}
 	
-	void Start() {
+	void Event1(){
 		
 	}
 	
+	void Event2(){
+		
+	}
+	
+	void Event3(){
+		
+	}
+	
+	void Tax(){
+		//playerList [currentPlayerIndex].money -= turn * 5000;
+	}
+
+	void FairyGodMother(){
+
+	}
+
+	public void StockRandomChange(){
+		stockPrice *= Random.Range(0.5f, 1.6f);
+	}
 }
