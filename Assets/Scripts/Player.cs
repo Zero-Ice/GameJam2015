@@ -13,6 +13,7 @@ public class Player : MonoBehaviour {
 	};
 
 	public List<StockData> stockDataList;
+	public List<Debt> debts;
 
 	public float money;
 
@@ -35,6 +36,7 @@ public class Player : MonoBehaviour {
 		currentBuildingIndex = 0;
 
 		stockDataList = new List<StockData> (30);
+		debts = new List<Debt>();
 
 		this.manager = GameObject.Find ("Game Manager").GetComponent<GameManager>();
 
@@ -82,13 +84,44 @@ public class Player : MonoBehaviour {
 		}
 	}
 
+	// UI Button Function to get out of idle state
+	void RollDice(){
+		idleDone = true;
+	}
+
 	// Wait for dice to roll finish and check which block player lands on
 	void RunRollDice(){
-		int diceroll = Random.Range (1, 7) + Random.Range (1, 7);
-		currentBuildingIndex += diceroll;
-		currentBuilding = manager.buildingList [currentBuildingIndex];
+		// To Do: Link Dice UI
+		int diceroll1 = Random.Range (1, 7);
+		int diceroll2 = Random.Range (1, 7);
 
-		// switch for building that player lands on
+		// To Do: Link Jailbreak UI, pay or roll double to escape
+
+		// If player is jailed, check for same dice roll
+		if (isJailed) {
+			if(diceroll1 == diceroll2){
+				isJailed = false;
+			} else {
+				rollDiceDone = true;
+			}
+		}
+
+		// If player is not jailed, move the player
+		if (!isJailed) {
+			currentBuildingIndex += (diceroll1 + diceroll2);
+
+			currentBuilding = manager.buildingList [currentBuildingIndex];
+			
+			// switch for building that player lands on
+			// Execute only once
+			currentBuilding.Execute (this);
+
+			rollDiceDone = true;
+		}
+
+		if (rollDiceDone) {
+			playerState = State.BUYMENU;
+		}
 	}
 
 	public void BuyStock() {
@@ -96,20 +129,26 @@ public class Player : MonoBehaviour {
 		if (money > manager.buildingList [currentBuildingIndex].finalStockPrice * 1000) {
 			stockDataList [currentBuildingIndex].stocksBought += 1000;
 			money -= manager.buildingList [currentBuildingIndex].finalStockPrice * 1000;
+			stockDataList[currentBuildingIndex].priceWhenBorrowed = manager.buildingList[currentBuildingIndex].finalStockPrice;
 		} else {
 			// UI to tell that the player does not have money to buy stock
 		}
 	}
 
 	public void SellStock(int buildingIndex) {
-		stockDataList [buildingIndex].stocksBought = 0;
-		money += 1000 * manager.buildingList [buildingIndex].finalStockPrice;
+		if (CheckIfBoughtStock(buildingIndex)) {
+			stockDataList [buildingIndex].stocksBought = 0;
+			money += 1000 * manager.buildingList [buildingIndex].finalStockPrice;
+		} else if (CheckIfBorrowedStock(buildingIndex)) {
+			stockDataList [buildingIndex].stocksBought = 0;
+			money += 1000 * manager.buildingList [buildingIndex].finalStockPrice;
+		}
 	}
 
 	public void BorrowStock(){
 		// If player has not bought or borrowed from that company
 		if (stockDataList [currentBuildingIndex].stocksBought > 0 || stockDataList [currentBuildingIndex].stocksBorrowed > 0) {
-			currentBuilding.AddDebtor (this);
+			AddDebt(manager.buildingList[currentBuildingIndex]);
 			stockDataList [currentBuildingIndex].stocksBorrowed += 1000;
 			stockDataList[currentBuildingIndex].currentStocks += 1000;
 			stockDataList[currentBuildingIndex].priceWhenBorrowed = manager.buildingList[currentBuildingIndex].finalStockPrice;
@@ -117,16 +156,59 @@ public class Player : MonoBehaviour {
 	}
 
 	public void ReturnStock(int buildingIndex) {
-		manager.buildingList[buildingIndex].ClearDebtor (this);
-		stockDataList [buildingIndex].stocksBorrowed = 0;
+		if (CheckIfBorrowedStock(buildingIndex)) {
+			ClearDebtor (buildingIndex);
+			stockDataList [buildingIndex].stocksBorrowed = 0;
 
-		// If player has kept borrowed stock
-		if (stockDataList [buildingIndex].currentStocks >= 1000) {
-			stockDataList[buildingIndex].currentStocks = 0;
-		} else {
-			// Player auto buys stocks from market ( loses money ) and returns stock borrowed
-			money -= manager.buildingList [buildingIndex].finalStockPrice * 1000;
+			// If player has kept borrowed stock
+			if (stockDataList [buildingIndex].currentStocks >= 1000) {
+				stockDataList [buildingIndex].currentStocks = 0;
+			} else {
+				// Player auto buys stocks from market ( loses money ) and returns stock borrowed
+				money -= manager.buildingList [buildingIndex].finalStockPrice * 1000;
+			}
 		}
+	}
+
+	public bool CheckIfBoughtStock(int buildingIndex){
+		if (stockDataList [buildingIndex].stocksBought > 0) {
+			return true;
+		} else {
+				return false;
+		}
+	}
+
+	public bool CheckIfBorrowedStock(int buildingIndex){
+		if (stockDataList [buildingIndex].stocksBorrowed > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public void AddDebt(Building building) {
+		debts.Add(new Debt(building));
+	}
+
+	public void UpdateDebtors() {
+		foreach (Debt x in debts) {
+			if(!x.UpdateTurn()){
+				ReturnStock(x.building.buildingIndex);
+			}
+		}
+	}
+	
+	public void ClearDebtor(int buildingIndex) {
+		foreach (Debt x in debts) {
+			if(x.building.buildingIndex == buildingIndex) {
+				ClearDebtor(x);
+				break;
+			}
+		}
+	}
+	
+	void ClearDebtor(Debt otherDebt) {
+		debts.Remove (otherDebt);
 	}
 }
 
@@ -143,7 +225,33 @@ public class StockData : MonoBehaviour {
 	// current stocks for return
 	public float currentStocks = 0;
 
+	// Price when borrowed / brought
 	public float priceWhenBorrowed = 0;
 }
 
+public class Debt : MonoBehaviour {
+	
+	public Building building;
+	public float noStocksOwed;
+	public int turns;
+	
+	public Debt(Building building) {
+		turns = 3;
+		this.building = building;
+	}
+	
+	public bool UpdateTurn() {
+		--turns;
+		if (turns > 0)
+			return true;
+		else {
+			return false;
+		}
+	}
+	
+	void Start() {
+		
+	}
+	
+}
 
