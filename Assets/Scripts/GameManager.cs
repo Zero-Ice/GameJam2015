@@ -8,9 +8,10 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] GameObject buyMenu;
 	[SerializeField] float[] stockPrice;
 	[SerializeField] float[] multiplier;
+	public GameObject[] playerSprite;
+	public Transform wayPoints;
 
-	int turn;
-	int turnIndex;
+	int turn, turnIndex;
 	float playerTurnTime;
 
 	public int noPlayers;
@@ -18,6 +19,12 @@ public class GameManager : MonoBehaviour {
 
 	public List<Building> buildingList = null;
 	public List<Player> playerList = null;
+
+	public int prevIndex, blockTargetMove, blocksLeftToMove, diceResult;
+	public float timerPerUnit, timeMoveLeft;
+	public bool canMove;
+
+
 
 	bool showBuyMenu, showSellMenu;
 
@@ -86,7 +93,7 @@ public class GameManager : MonoBehaviour {
 		// If timer runs up, move to the next player
 		if (playerTurnTime < 0) {
 			// Reset
-			playerTurnTime = 25;
+			playerTurnTime = 30;
 			player.End();
 			// Go to next player
 			++currentPlayerIndex;
@@ -128,6 +135,37 @@ public class GameManager : MonoBehaviour {
 
 			if(currentPlayerIndex >= noPlayers) {
 				currentPlayerIndex = 0;
+			}
+		}
+		
+		if(canMove)
+		{
+			Debug.Log (blocksLeftToMove + "Dice result");
+			Debug.Log (blockTargetMove + "block Target");
+//			Debug.Log(prevIndex);
+			timeMoveLeft -= Time.deltaTime;
+			
+			//playerSprite[currentPlayerIndex].transform.position = wayPoints.GetChild(blockTargetMove).position;
+			playerSprite[currentPlayerIndex].transform.position = Vector3.Lerp(playerSprite[currentPlayerIndex].transform.position, wayPoints.GetChild(blockTargetMove).position, Time.deltaTime * 20);
+			if (timeMoveLeft <= 0)
+			{
+				timeMoveLeft = timerPerUnit;
+				if (blocksLeftToMove != 0)
+				{
+					
+					blockTargetMove = diceResult - (blocksLeftToMove - 1);
+					blocksLeftToMove -= 1;
+					
+					if (blockTargetMove > 29)
+						blockTargetMove = prevIndex + blocksLeftToMove - 30;
+				}
+				else
+				{
+					Debug.Log("End");
+					canMove = false;
+					playerList [currentPlayerIndex].rollDiceDone = true;
+					playerList [currentPlayerIndex].currentBuildingIndex = blockTargetMove;
+				}
 			}
 		}
 	}

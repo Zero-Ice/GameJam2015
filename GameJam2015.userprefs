@@ -2,10 +2,8 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\MarketButtonScript.cs" Line="50" Column="5" />
-      <File FileName="Assets\Scripts\Player.cs" Line="137" Column="17" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="154" Column="4" />
-      <File FileName="Assets\Scripts\Building.cs" Line="21" Column="35" />
+      <File FileName="Assets\Scripts\Player.cs" Line="114" Column="3" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="157" Column="28" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

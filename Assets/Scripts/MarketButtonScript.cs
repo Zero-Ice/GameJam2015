@@ -44,7 +44,7 @@ public class MarketButtonScript : MonoBehaviour {
 					index -= 1;
 				}
 
-				Debug.Log(marketData.transform.GetChild(j).GetChild(index).gameObject.name);
+				//Debug.Log(marketData.transform.GetChild(j).GetChild(index).gameObject.name);
 				marketInfo[i][j] = (marketData.transform.GetChild(j).GetChild(index).gameObject);
 
 			}

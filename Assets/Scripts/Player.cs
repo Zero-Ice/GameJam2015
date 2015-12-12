@@ -28,6 +28,7 @@ public class Player {
 	GameManager manager;
 
 	public int currentBuildingIndex;
+	
 	Building currentBuilding;
 
 	// Use this for initialization
@@ -55,7 +56,8 @@ public class Player {
 	}
 
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+	{
 		
 	}
 
@@ -92,6 +94,8 @@ public class Player {
 
 	// Wait for dice to roll finish and check which block player lands on
 	void RunRollDice(){
+		if (!manager.canMove)
+		{
 		// To Do: Link Dice UI
 		int diceroll1 = Random.Range (1, 7);
 		int diceroll2 = Random.Range (1, 7);
@@ -106,22 +110,24 @@ public class Player {
 				rollDiceDone = true;
 			}
 		}
-
+		int diceResults = diceroll1 + diceroll2;
+		
 		// If player is not jailed, move the player
 		if (!isJailed) {
-			int prevIndex = currentBuildingIndex;
-			currentBuildingIndex += (diceroll1 + diceroll2);
-			if(currentBuildingIndex > 29){
-				currentBuildingIndex -= 29;
-			}
+			manager.prevIndex = currentBuildingIndex;
+			manager.timerPerUnit = (float)(1f/diceResults);
+			manager.timeMoveLeft = (float)(1f/diceResults);
+			manager.blockTargetMove = diceResults;
+			manager.diceResult = diceResults;
+			manager.blocksLeftToMove = currentBuildingIndex;
+			manager.canMove = true;
 
 			currentBuilding = manager.buildingList [currentBuildingIndex];
 			
 			// switch for building that player lands on
 			// Execute only once
 			currentBuilding.Execute (this);
-
-			rollDiceDone = true;
+		}
 		}
 	}
 
