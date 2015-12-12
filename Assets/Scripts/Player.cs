@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Player : MonoBehaviour {
+public class Player {
 
 	public enum State
 	{
@@ -125,14 +125,16 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public void BuyStock() {
+	public bool BuyStock() {
 		// If player has money to buy 1000 stocks
 		if (money > manager.buildingList [currentBuildingIndex].finalStockPrice * 1000) {
 			stockDataList [currentBuildingIndex].stocksBought += 1000;
 			money -= manager.buildingList [currentBuildingIndex].finalStockPrice * 1000;
 			stockDataList[currentBuildingIndex].priceWhenBorrowed = manager.buildingList[currentBuildingIndex].finalStockPrice;
+			return true;
 		} else {
 			// UI to tell that the player does not have money to buy stock
+			return false;
 		}
 	}
 
@@ -146,14 +148,14 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	public void BorrowStock(){
+	public bool BorrowStock(){
 		// If player has not bought or borrowed from that company
-		if (stockDataList [currentBuildingIndex].stocksBought > 0 || stockDataList [currentBuildingIndex].stocksBorrowed > 0) {
-			AddDebt(manager.buildingList[currentBuildingIndex]);
-			stockDataList [currentBuildingIndex].stocksBorrowed += 1000;
-			stockDataList[currentBuildingIndex].currentStocks += 1000;
-			stockDataList[currentBuildingIndex].priceWhenBorrowed = manager.buildingList[currentBuildingIndex].finalStockPrice;
-		}
+
+		AddDebt(manager.buildingList[currentBuildingIndex]);
+		stockDataList [currentBuildingIndex].stocksBorrowed += 1000;
+		stockDataList[currentBuildingIndex].currentStocks += 1000;
+		stockDataList[currentBuildingIndex].priceWhenBorrowed = manager.buildingList[currentBuildingIndex].finalStockPrice;
+		return true;
 	}
 
 	public void ReturnStock(int buildingIndex) {
@@ -213,7 +215,7 @@ public class Player : MonoBehaviour {
 	}
 }
 
-public class StockData : MonoBehaviour {
+public class StockData {
 
 	public StockData(){
 
@@ -241,7 +243,7 @@ public class StockData : MonoBehaviour {
 	}
 }
 
-public class Debt : MonoBehaviour {
+public class Debt {
 	
 	public Building building;
 	public float noStocksOwed;

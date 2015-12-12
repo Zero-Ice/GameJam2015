@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Building : MonoBehaviour {
+public class Building {
 
 	public enum BuildingType
 	{
@@ -18,7 +18,7 @@ public class Building : MonoBehaviour {
 
 	}
 
-	public string buildingName = "";
+	public string buildingName = "ayy";
 	public int buildingIndex;
 	float stockPrice = 5;
 	public float finalStockPrice;

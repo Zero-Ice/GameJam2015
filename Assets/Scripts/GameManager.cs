@@ -47,7 +47,6 @@ public class GameManager : MonoBehaviour {
 			Player player = new Player();
 			player.Init();
 			playerList.Add(player);
-			Debug.Log (playerList.Count);
 		}
 
 		buildingList [0].type = Building.BuildingType.Start;
@@ -151,17 +150,24 @@ public class GameManager : MonoBehaviour {
 			showBuyMenu = false;
 			player.buyDone = false;
 			player.playerState = Player.State.SELLMENU;
+			return;
 		}
 	}
 
 	public void BuyButton(){
-		playerList [currentPlayerIndex].BuyStock ();
-		playerList [currentPlayerIndex].buyDone = true;
+		if (showBuyMenu) {
+			if(playerList [currentPlayerIndex].BuyStock ()){
+				playerList [currentPlayerIndex].buyDone = true;
+			}
+		}
 	}
 
 	public void BorrowButton(){
-		playerList [currentPlayerIndex].BorrowStock ();
-		playerList [currentPlayerIndex].buyDone = true;
+		if (showBuyMenu) {
+			if(playerList [currentPlayerIndex].BorrowStock ()){
+				playerList [currentPlayerIndex].buyDone = true;
+			}
+		}
 	}
 
 	// Function to check that player has not bought or borrowed from that building
@@ -190,6 +196,7 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void OpenMarket(){
+		GetComponent<MarketButtonScript> ().OpenUI ();
 		showSellMenu = true;
 	}
 
