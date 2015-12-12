@@ -43,12 +43,12 @@ public class GameManager : MonoBehaviour {
 		playerList.Add (new Player());
 		playerList [0].turn = true;
 
-		showBuyMenu = false;
-		showSellMenu = false;
+		showBuyMenu = showSellMenu = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		// Current player
 		Player player;
 		player = playerList [currentPlayerIndex];
 
@@ -56,11 +56,16 @@ public class GameManager : MonoBehaviour {
 
 		// If timer runs up, move to the next player
 		if (playerTurnTime < 0) {
+			// Reset
 			playerTurnTime = 25;
+			player.End();
+			// Go to next player
 			++currentPlayerIndex;
 			if(currentPlayerIndex > noPlayers) {
 				currentPlayerIndex = 0;
 			}
+			// Set new current player
+			player = playerList [currentPlayerIndex];
 		}
 
 		// Update current player's turn
@@ -68,7 +73,7 @@ public class GameManager : MonoBehaviour {
 
 		// If player is done, start the next player's turn
 		if (player.done) {
-			player.done = false;
+			player.End();
 			++currentPlayerIndex;
 			// Turn increment
 			turnIndex += 1 / noPlayers;
@@ -78,9 +83,10 @@ public class GameManager : MonoBehaviour {
 				turn += 1;
 			}
 
+			// Randomize the stocks of every building every 2 turns
 			if(turn % 2 == 0){
 				foreach(Building x in buildingList){
-					x.stockPrice *= Random.Range(0.5f, 1.6f);
+					x.StockRandomChange();
 				}
 			}
 
@@ -92,13 +98,13 @@ public class GameManager : MonoBehaviour {
 
 	// Player buy
 	public void RunBuyMenu(){
-		showBuyMenu = true;
 
 		Player player;
 		player = playerList [currentPlayerIndex];
 
 		if (CheckIfPlayerCanBuy(player)) {
-
+			// Display the buy menu 
+			showBuyMenu = true;
 			// UI function here
 			//if(UI click buy ) {
 			//	playerList [currentPlayerIndex].BuyStock ();
@@ -107,10 +113,11 @@ public class GameManager : MonoBehaviour {
 			//} else if (UI click close) {
 			//	player.buyDone = true;
 			//}
-		} else { // If player is unable to perform any actions
+		} else { // If player is unable to buy or borrow
 			player.buyDone = true;
 		}
 
+		// Transition to sell state
 		if (player.buyDone) {
 			showBuyMenu = false;
 			player.buyDone = false;
@@ -118,9 +125,12 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	// Function to check that player has not bought or borrowed from that building
 	bool CheckIfPlayerCanBuy(Player player) {
 		if (player.stockDataList [player.currentBuildingIndex].stocksBorrowed == 0 && player.stockDataList [player.currentBuildingIndex].stocksBought == 0) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -134,7 +144,10 @@ public class GameManager : MonoBehaviour {
 			//playerList[currentPlayerIndex].SellStock(
 		//}
 
-
+		// Player clicks end turn
+		if (player.sellDone) {
+			player.done = true;
+		}
 	}
 
 	void Jail(){

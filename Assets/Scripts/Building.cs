@@ -16,9 +16,9 @@ public class Building : MonoBehaviour {
 
 	public string buildingName = "";
 	public int buildingIndex;
-	public float stockPrice = 5;
+	float stockPrice = 5;
 	public float finalStockPrice;
-	public float multiplier = 1;
+	float multiplier = 1;
 
 	List<Debt> debtors;
 
@@ -33,6 +33,10 @@ public class Building : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+	}
+
+	public void StockRandomChange(){
+		stockPrice *= Random.Range(0.5f, 1.6f);
 	}
 
 	public void AddDebtor(Player otherPlayer) {

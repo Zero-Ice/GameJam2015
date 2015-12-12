@@ -16,7 +16,7 @@ public class Player : MonoBehaviour {
 
 	public float money;
 
-	public bool turn, done, buyDone, isJailed;
+	public bool turn, done, idleDone, rollDiceDone, buyDone, sellDone, isJailed;
 
 	public State playerState;
 
@@ -28,10 +28,7 @@ public class Player : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		money = 200000;
-		turn = false;
-		done = false;
-		buyDone = false;
-		isJailed = false;
+		turn = done = idleDone = buyDone = rollDiceDone = sellDone = isJailed = false;
 
 		playerState = State.IDLE;
 
@@ -48,12 +45,17 @@ public class Player : MonoBehaviour {
 
 
 	}
-	
+
 	// Update is called once per frame
 	void Update () {
 		
 	}
-	
+
+	public void End(){
+		playerState = State.IDLE;
+		turn = done = idleDone = buyDone = rollDiceDone = isJailed = false;
+	}
+
 	public void UpdateTurn() {
 		switch (playerState) {
 		case State.IDLE:
@@ -74,7 +76,10 @@ public class Player : MonoBehaviour {
 
 	// Wait for player to roll dice
 	void RunIdle(){
-	
+		// Player will click on a button which sets idle done, then transition to roll dice state
+		if (idleDone) {
+			playerState = State.ROLLDICE;
+		}
 	}
 
 	// Wait for dice to roll finish and check which block player lands on
@@ -87,13 +92,12 @@ public class Player : MonoBehaviour {
 	}
 
 	public void BuyStock() {
-		// If player has not bought or borrowed from that company
-		if (stockDataList [currentBuildingIndex].stocksBought > 0 || stockDataList [currentBuildingIndex].stocksBorrowed > 0) {
-			// If player has money to buy 1000 stocks
-			if (money > manager.buildingList [currentBuildingIndex].stockPrice * 1000) {
-				stockDataList [currentBuildingIndex].stocksBought += 1000;
-				money -= manager.buildingList [currentBuildingIndex].stockPrice * 1000;
-			}
+		// If player has money to buy 1000 stocks
+		if (money > manager.buildingList [currentBuildingIndex].finalStockPrice * 1000) {
+			stockDataList [currentBuildingIndex].stocksBought += 1000;
+			money -= manager.buildingList [currentBuildingIndex].finalStockPrice * 1000;
+		} else {
+			// UI to tell that the player does not have money to buy stock
 		}
 	}
 
@@ -124,8 +128,6 @@ public class Player : MonoBehaviour {
 			money -= manager.buildingList [buildingIndex].finalStockPrice * 1000;
 		}
 	}
-
-
 }
 
 public class StockData : MonoBehaviour {
