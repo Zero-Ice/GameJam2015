@@ -118,10 +118,6 @@ public class Player : MonoBehaviour {
 
 			rollDiceDone = true;
 		}
-
-		if (rollDiceDone) {
-			playerState = State.BUYMENU;
-		}
 	}
 
 	public void BuyStock() {
@@ -137,10 +133,10 @@ public class Player : MonoBehaviour {
 
 	public void SellStock(int buildingIndex) {
 		if (CheckIfBoughtStock(buildingIndex)) {
-			stockDataList [buildingIndex].stocksBought = 0;
+			stockDataList [buildingIndex].Reset();
 			money += 1000 * manager.buildingList [buildingIndex].finalStockPrice;
 		} else if (CheckIfBorrowedStock(buildingIndex)) {
-			stockDataList [buildingIndex].stocksBought = 0;
+			stockDataList [buildingIndex].currentStocks = 0;
 			money += 1000 * manager.buildingList [buildingIndex].finalStockPrice;
 		}
 	}
@@ -158,14 +154,14 @@ public class Player : MonoBehaviour {
 	public void ReturnStock(int buildingIndex) {
 		if (CheckIfBorrowedStock(buildingIndex)) {
 			ClearDebtor (buildingIndex);
-			stockDataList [buildingIndex].stocksBorrowed = 0;
 
 			// If player has kept borrowed stock
 			if (stockDataList [buildingIndex].currentStocks >= 1000) {
-				stockDataList [buildingIndex].currentStocks = 0;
+				stockDataList [buildingIndex].Reset();
 			} else {
 				// Player auto buys stocks from market ( loses money ) and returns stock borrowed
 				money -= manager.buildingList [buildingIndex].finalStockPrice * 1000;
+				stockDataList [buildingIndex].Reset();
 			}
 		}
 	}
@@ -227,6 +223,13 @@ public class StockData : MonoBehaviour {
 
 	// Price when borrowed / brought
 	public float priceWhenBorrowed = 0;
+
+	public void Reset(){
+		stocksBought = 0;
+		stocksBorrowed = 0;
+		currentStocks = 0;
+		priceWhenBorrowed = 0;
+	}
 }
 
 public class Debt : MonoBehaviour {

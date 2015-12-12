@@ -40,7 +40,8 @@ public class MarketButtonScript : MonoBehaviour {
 			marketInfo[i][0].GetComponent<Text>().text = manager.buildingList[i].name;
 			// If player borrow, set color to red and set to show turns 
 			if(player.CheckIfBorrowedStock(i)){
-				marketInfo[i][1].GetComponent<Text>().color = Color.red;
+				marketInfo[i][1].GetComponent<RawImage>().color = Color.red;
+				marketInfo[i][1].GetComponent<Text>().color = Color.white;
 				foreach(Debt debt in player.debts){
 					if(debt.building.buildingIndex == i){
 						marketInfo[i][1].GetComponent<Text>().text = debt.turns.ToString();
@@ -48,10 +49,11 @@ public class MarketButtonScript : MonoBehaviour {
 					}
 				}
 			} else if(player.CheckIfBoughtStock(i)){// Set color to blue and no text
-				marketInfo[i][1].GetComponent<Text>().color = Color.blue;
+				marketInfo[i][1].GetComponent<RawImage>().color = Color.blue;
+				marketInfo[i][1].GetComponent<Text>().color = Color.white;
 				marketInfo[i][1].GetComponent<Text>().text = "";
 			} else { // If player has no relation with the building
-				marketInfo[i][1].GetComponent<Text>().color = Color.black;
+				marketInfo[i][1].GetComponent<RawImage>().color = Color.white;
 				marketInfo[i][1].GetComponent<Text>().text = "";
 			}
 

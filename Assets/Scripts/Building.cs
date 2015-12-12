@@ -24,12 +24,17 @@ public class Building : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		finalStockPrice = stockPrice * multiplier;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
+	}
+
+	public void Init(float multiplier, float stockPrice){
+		this.multiplier = multiplier;
+		this.stockPrice = stockPrice;
+		finalStockPrice = stockPrice * multiplier;
 	}
 
 	public void Execute(Player player){
@@ -47,8 +52,11 @@ public class Building : MonoBehaviour {
 			break;
 		case BuildingType.FairyGodMother:
 			FairyGodMother();
+			player.playerState = Player.State.SELLMENU;
 			break;
-
+		case BuildingType.Tax:
+			Tax (player);
+			break;
 		}
 	}
 
@@ -71,27 +79,62 @@ public class Building : MonoBehaviour {
 		case 2:
 			Event3 ();
 			break;
+		default:
+			break;
 		}
 	}
 	
 	void Event1(){
-		
+		GameManager manager = GameObject.Find ("Game Manager").GetComponent<GameManager> ();
+
+		int building1 = Random.Range(0, 30);
+		int building2 = Random.Range(0, 30);
+
+		manager.buildingList [building1].StockRandomChange ();
+		manager.buildingList [building2].StockRandomChange ();
 	}
 	
 	void Event2(){
+		GameManager manager = GameObject.Find ("Game Manager").GetComponent<GameManager> ();
+
+		int building1 = Random.Range(0, 30);
+		int building2 = Random.Range(0, 30);
 		
+		manager.buildingList [building1].stockPrice *= Random.Range(1f, 1.5f);
+		manager.buildingList [building2].stockPrice *= Random.Range (1f, 1.5f);
 	}
 	
 	void Event3(){
+		GameManager manager = GameObject.Find ("Game Manager").GetComponent<GameManager> ();
+
+		int building1 = Random.Range(0, 30);
+		int building2 = Random.Range(0, 30);
 		
+		manager.buildingList [building1].stockPrice *= Random.Range(0.5f, 1f);
+		manager.buildingList [building2].stockPrice *= Random.Range (0.5f, 1f);
 	}
 	
-	void Tax(){
-		//playerList [currentPlayerIndex].money -= turn * 5000;
+	void Tax(Player player){
+		player.money *= 0.85f;
 	}
 
 	void FairyGodMother(){
+		int choice = Random.Range(0, 2);
 
+		GameManager manager = GameObject.Find ("Game Manager").GetComponent<GameManager> ();
+
+		switch (choice) {
+		case 0:
+			foreach(Building x in manager.buildingList){
+				x.stockPrice *= Random.Range(0.5f, 1f);
+			}
+			break;
+		case 1:
+			foreach(Building x in manager.buildingList){
+				x.stockPrice *= Random.Range(1f, 1.5f);
+			}
+			break;
+		}
 	}
 
 	public void StockRandomChange(){

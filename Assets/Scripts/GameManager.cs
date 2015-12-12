@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
+	[SerializeField] float[] stockPrice;
+	[SerializeField] float[] multiplier;
+
 	int turn;
 	int turnIndex;
 	float playerTurnTime;
@@ -24,12 +27,18 @@ public class GameManager : MonoBehaviour {
 		currentPlayerIndex = 0;
 
 		playerList = new List<Player> (noPlayers);
+		noPlayers = 2;
+		for (int i = 0; i < noPlayers; i++) {
+			playerList.Add(new Player());
+		}
+
 		buildingList = new List<Building> (30);
 
 		for (int i = 0; i < 29; i++) {
 			buildingList[i] = new Building();
 			buildingList[i].type = Building.BuildingType.Company;
 			buildingList[i].buildingIndex = i;
+			buildingList[i].Init(multiplier[i], stockPrice[i]);
 		}
 
 		buildingList [0].type = Building.BuildingType.Start;
@@ -39,9 +48,9 @@ public class GameManager : MonoBehaviour {
 		buildingList [19].type = Building.BuildingType.FairyGodMother;
 		buildingList [26].type = Building.BuildingType.RandomEvent;
 
-		playerList.Add (new Player());
-		playerList.Add (new Player());
-		playerList [0].turn = true;
+		int playerStart = Random.Range (0, noPlayers);
+
+		playerList [playerStart].turn = true;
 
 		showBuyMenu = showSellMenu = false;
 	}
@@ -138,13 +147,8 @@ public class GameManager : MonoBehaviour {
 
 	// Player sell
 	public void RunSellMenu(){
-		showSellMenu = true;
-
 		Player player;
 		player = playerList [currentPlayerIndex];
-		//if(UI click sell) {
-			//playerList[currentPlayerIndex].SellStock(
-		//}
 
 		// Player clicks end turn
 		if (player.sellDone) {
