@@ -63,7 +63,7 @@ public class Player {
 
 	public void End(){
 		playerState = State.IDLE;
-		turn = done = idleDone = buyDone = sellDone = rollDiceDone = isJailed = false;
+		turn = done = idleDone = buyDone = sellDone = rollDiceDone = false;
 	}
 
 	public void UpdateTurn() {
@@ -108,7 +108,6 @@ public class Player {
 						isJailed = false;
 					} else {
 						isJailed = true;
-						manager.canMove = false;
 					}
 				}
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
-	[SerializeField] GameObject market, buyMenu;
+	[SerializeField] GameObject market, buyMenu, jailMenu;
 	[SerializeField] float[] stockPrice;
 	[SerializeField] float[] multiplier;
 	[SerializeField] GameObject player1UI;
@@ -101,6 +101,7 @@ public class GameManager : MonoBehaviour {
 		} else {
 			buyMenu.SetActive(false);
 		}
+
 		// Current player
 
 		Player player;	
@@ -329,6 +330,11 @@ public class GameManager : MonoBehaviour {
 
 	// UI Button Function to get out of idle state
 	public void RollDice(){
+		Player player = playerList [currentPlayerIndex];
+		if (player.isJailed && player.playerState == Player.State.IDLE) {
+			jailMenu.SetActive(true);
+			return;
+		}
 		if (playerList [currentPlayerIndex].playerState == Player.State.IDLE) {
 			playerList [currentPlayerIndex].idleDone = true;
 		}
@@ -349,5 +355,17 @@ public class GameManager : MonoBehaviour {
 		if (playerList [currentPlayerIndex].playerState == Player.State.SELLMENU) {
 			playerList [currentPlayerIndex].sellDone = true;
 		}
+	}
+
+	public void EscapeNow(){
+		playerList [currentPlayerIndex].idleDone = true;
+		playerList [currentPlayerIndex].isJailed = false;
+		playerList [currentPlayerIndex].money *= 0.8;
+		jailMenu.SetActive (false);
+	}
+
+	public void RollDoubleEscape(){
+		playerList [currentPlayerIndex].idleDone = true;
+		jailMenu.SetActive (false);
 	}
 }
