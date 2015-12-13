@@ -106,7 +106,9 @@ public class Building {
 		int building2 = Random.Range(0, 30);
 		
 		manager.buildingList [building1].stockPrice *= Random.Range(1f, 1.5f);
+		manager.buildingList [building1].UpdateFinalPrice ();
 		manager.buildingList [building2].stockPrice *= Random.Range (1f, 1.5f);
+		manager.buildingList [building2].UpdateFinalPrice ();
 	}
 	
 	void Event3(){
@@ -116,7 +118,9 @@ public class Building {
 		int building2 = Random.Range(0, 30);
 		
 		manager.buildingList [building1].stockPrice *= Random.Range(0.5f, 1f);
+		manager.buildingList [building1].UpdateFinalPrice ();
 		manager.buildingList [building2].stockPrice *= Random.Range (0.5f, 1f);
+		manager.buildingList [building2].UpdateFinalPrice ();
 	}
 	
 	void Tax(Player player){
@@ -132,11 +136,13 @@ public class Building {
 		case 0:
 			foreach(Building x in manager.buildingList){
 				x.stockPrice *= Random.Range(0.5f, 1f);
+				x.UpdateFinalPrice();
 			}
 			break;
 		case 1:
 			foreach(Building x in manager.buildingList){
 				x.stockPrice *= Random.Range(1f, 1.5f);
+				x.UpdateFinalPrice();
 			}
 			break;
 		}
@@ -144,5 +150,10 @@ public class Building {
 
 	public void StockRandomChange(){
 		stockPrice *= Random.Range(0.5f, 1.6f);
+		UpdateFinalPrice ();
+	}
+
+	public void UpdateFinalPrice(){
+		finalStockPrice = stockPrice * multiplier;
 	}
 }

@@ -5,12 +5,12 @@ using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
 
-	[SerializeField] GameObject market;
-	[SerializeField] GameObject buyMenu;
+	[SerializeField] GameObject market, buyMenu;
 	[SerializeField] float[] stockPrice;
 	[SerializeField] float[] multiplier;
 	[SerializeField] GameObject player1UI;
 	[SerializeField] GameObject player2UI;
+	[SerializeField] GameObject player1Money, player2Money;
 	public GameObject[] playerSprite;
 	public Transform wayPoints;
 
@@ -106,11 +106,15 @@ public class GameManager : MonoBehaviour {
 		Player player;	
 		player = playerList [currentPlayerIndex];
 
+		player1Money.GetComponent<Text> ().text = ((int)playerList [0].money).ToString();
+		player2Money.GetComponent<Text> ().text = ((int)playerList [1].money).ToString();
+
 		playerTurnTime -= Time.deltaTime;
 		
 		// Update current player's turn
 		player.UpdateTurn ();
 
+		// Player movement
 		if(canMove)
 		{
 			timeMoveLeft -= Time.deltaTime;
@@ -135,6 +139,17 @@ public class GameManager : MonoBehaviour {
 					player.currentBuilding = buildingList [player.currentBuildingIndex];
 					player.currentBuilding.Execute(player);
 				}
+			}
+		}
+
+		// Check winning conditions
+		if (player.money > 1000000) {
+			Debug.Log ("Player wins");
+		} else if (turn >= 50) {
+			if(playerList[0].money > playerList[1].money){
+				Debug.Log("Player 1 wins");
+			} else {
+				Debug.Log("Player 2 wins");
 			}
 		}
 

@@ -167,7 +167,7 @@ public class Player {
 			stockDataList [buildingIndex].Reset();
 			money += 1000 * manager.buildingList [buildingIndex].finalStockPrice;
 		} else if (CheckIfBorrowedStock(buildingIndex)) {
-			stockDataList [buildingIndex].currentStocks = 0;
+			stockDataList [buildingIndex].Reset();
 			money += 1000 * manager.buildingList [buildingIndex].finalStockPrice;
 		}
 	}
@@ -274,7 +274,7 @@ public class Debt {
 	public int turns;
 	
 	public Debt(Building building) {
-		turns = 3;
+		turns = 6;
 		this.building = building;
 	}
 	
