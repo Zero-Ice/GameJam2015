@@ -69,7 +69,6 @@ public class MarketButtonScript : MonoBehaviour {
 //			Debug.Log(marketInfo[i][j].transform.GetChild(0).GetComponent<Text>().text);
 
 			marketInfo[i][0].transform.GetChild(0).GetComponent<Text>().text = manager.buildingList[i].buildingName;
-			Debug.Log(marketInfo[i][0].transform.GetChild(0).GetComponent<Text>().text);
 
 			// If player borrow, set color to red and set to show turns 
 			if(player.CheckIfBorrowedStock(i)){

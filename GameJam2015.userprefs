@@ -1,11 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\MarketButtonScript.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\GameManager.cs">
     <Files>
-      <File FileName="Assets\Scripts\Dice.cs" Line="8" Column="17" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="351" Column="24" />
+      <File FileName="Assets\Scripts\Dice.cs" Line="1" Column="1" />
       <File FileName="Assets\Scripts\Player.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\GameManager.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\MarketButtonScript.cs" Line="8" Column="2" />
+      <File FileName="Assets\Scripts\MarketButtonScript.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\Building.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

@@ -360,7 +360,7 @@ public class GameManager : MonoBehaviour {
 	public void EscapeNow(){
 		playerList [currentPlayerIndex].idleDone = true;
 		playerList [currentPlayerIndex].isJailed = false;
-		playerList [currentPlayerIndex].money *= 0.8;
+		playerList [currentPlayerIndex].money *= 0.8f;
 		jailMenu.SetActive (false);
 	}
 
