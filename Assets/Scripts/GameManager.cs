@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,6 +9,8 @@ public class GameManager : MonoBehaviour {
 	[SerializeField] GameObject buyMenu;
 	[SerializeField] float[] stockPrice;
 	[SerializeField] float[] multiplier;
+	[SerializeField] GameObject player1UI;
+	[SerializeField] GameObject player2UI;
 	public GameObject[] playerSprite;
 	public Transform wayPoints;
 
@@ -20,7 +23,7 @@ public class GameManager : MonoBehaviour {
 	public List<Building> buildingList = null;
 	public List<Player> playerList = null;
 
-	public int prevIndex, blockTargetMove, blocksLeftToMove, diceResult;
+	public int prevIndex, blockTargetMove, blockFinalTarget, blocksLeftToMove, diceResult;
 	public float timerPerUnit, timeMoveLeft;
 	public bool canMove;
 
@@ -35,6 +38,9 @@ public class GameManager : MonoBehaviour {
 		playerTurnTime = 30;
 		currentPlayerIndex = 0;
 		noPlayers = 2;
+
+		canMove = false;
+		timeMoveLeft = 5;
 
 		buildingList = new List<Building> ();
 
@@ -68,6 +74,18 @@ public class GameManager : MonoBehaviour {
 
 		playerList [playerStart].turn = true;
 
+		player1UI.GetComponent<Image>().color = new Color(1, 1, 1, 0.3f);	
+		player2UI.GetComponent<Image>().color = new Color(1, 1, 1, 0.3f);	
+
+		switch (playerStart) {
+		case 0:
+			player1UI.GetComponent<Image> ().color = new Color(1, 1, 1, 1f);
+			break;
+		case 1:
+			player2UI.GetComponent<Image> ().color = new Color(1, 1, 1, 1f);
+			break;
+		}
+
 		showBuyMenu = showSellMenu = false;
 	}
 	
@@ -89,34 +107,73 @@ public class GameManager : MonoBehaviour {
 		player = playerList [currentPlayerIndex];
 
 		playerTurnTime -= Time.deltaTime;
+		
+		// Update current player's turn
+		player.UpdateTurn ();
 
-		// If timer runs up, move to the next player
-		if (playerTurnTime < 0) {
-			// Reset
+		if(canMove)
+		{
+			timeMoveLeft -= Time.deltaTime;
+			
+			//playerSprite[currentPlayerIndex].transform.position = wayPoints.GetChild(blockTargetMove).position;
+			playerSprite[currentPlayerIndex].transform.position = Vector3.Lerp(playerSprite[currentPlayerIndex].transform.position, wayPoints.GetChild(blockTargetMove).position, Time.deltaTime * 20);
+			if (timeMoveLeft <= 0)
+			{
+				timeMoveLeft = timerPerUnit;
+				
+				if(blockTargetMove != blockFinalTarget){
+					blockTargetMove += 1;
+					if (blockTargetMove > 29)
+						blockTargetMove = 0;
+				}
+				else
+				{
+					canMove = false;
+					
+					player.rollDiceDone = true;
+					player.currentBuildingIndex = blockFinalTarget;
+					player.currentBuilding = buildingList [player.currentBuildingIndex];
+					player.currentBuilding.Execute(player);
+				}
+			}
+		}
+
+		// If player is done, start the next player's turn
+		if (player.done) {
+			// Reset values
+			showBuyMenu = false;
+			showSellMenu = false;
+
 			playerTurnTime = 30;
 			player.End();
-			// Go to next player
-			++currentPlayerIndex;
 
+			// Change the non-active player UI to translucent
+			switch (currentPlayerIndex) {
+			case 0:
+				player1UI.GetComponent<Image> ().color = new Color(1, 1, 1, 0.3f);
+				break;
+			case 1:
+				player2UI.GetComponent<Image> ().color = new Color(1, 1, 1, 0.3f);
+				break;
+			}
+
+			// Next player
+			++currentPlayerIndex;
 			if(currentPlayerIndex >= noPlayers) {
 				currentPlayerIndex = 0;
 			}
 
-			// Set new current player
-			player = playerList [currentPlayerIndex];
-		}
+			// Set the new active player UI to opaque
+			switch (currentPlayerIndex) {
+			case 0:
+				player1UI.GetComponent<Image> ().color = new Color(1, 1, 1, 1f);
+				break;
+			case 1:
+				player2UI.GetComponent<Image> ().color = new Color(1, 1, 1, 1f);
+				break;
+			}
 
-		Debug.Log (player.playerState.ToString ());
-		// Update current player's turn
-		player.UpdateTurn ();
-
-		// If player is done, start the next player's turn
-		if (player.done) {
-			showBuyMenu = false;
-			showSellMenu = false;
-
-			player.End();
-			++currentPlayerIndex;
+			Debug.Log("Button Player End Turn");
 
 			// Turn increment
 			turnIndex += 1 / noPlayers;
@@ -132,39 +189,53 @@ public class GameManager : MonoBehaviour {
 					x.StockRandomChange();
 				}
 			}
+		}
+		// If timer runs up, move to the next player
+		else if (playerTurnTime < 0) {
+			showBuyMenu = false;
+			showSellMenu = false;
 
+			// Reset
+			playerTurnTime = 30;
+			player.End();
+			// Go to next player
+
+			switch (currentPlayerIndex) {
+			case 0:
+				player1UI.GetComponent<Image> ().color = new Color(1, 1, 1, 0.3f);
+				break;
+			case 1:
+				player2UI.GetComponent<Image> ().color = new Color(1, 1, 1, 0.3f);
+				break;
+			}
+
+			++currentPlayerIndex;
 			if(currentPlayerIndex >= noPlayers) {
 				currentPlayerIndex = 0;
 			}
-		}
-		
-		if(canMove)
-		{
-			Debug.Log (blocksLeftToMove + "Dice result");
-			Debug.Log (blockTargetMove + "block Target");
-//			Debug.Log(prevIndex);
-			timeMoveLeft -= Time.deltaTime;
+
+			switch (currentPlayerIndex) {
+			case 0:
+				player1UI.GetComponent<Image> ().color = new Color(1, 1, 1, 1f);
+				break;
+			case 1:
+				player2UI.GetComponent<Image> ().color = new Color(1, 1, 1, 1f);
+				break;
+			}
+
+			Debug.Log("Timer Run Out Player End Turn");
+			// Turn increment
+			turnIndex += 1 / noPlayers;
 			
-			//playerSprite[currentPlayerIndex].transform.position = wayPoints.GetChild(blockTargetMove).position;
-			playerSprite[currentPlayerIndex].transform.position = Vector3.Lerp(playerSprite[currentPlayerIndex].transform.position, wayPoints.GetChild(blockTargetMove).position, Time.deltaTime * 20);
-			if (timeMoveLeft <= 0)
-			{
-				timeMoveLeft = timerPerUnit;
-				if (blocksLeftToMove != 0)
-				{
-					
-					blockTargetMove = diceResult - (blocksLeftToMove - 1);
-					blocksLeftToMove -= 1;
-					
-					if (blockTargetMove > 29)
-						blockTargetMove = prevIndex + blocksLeftToMove - 30;
-				}
-				else
-				{
-					Debug.Log("End");
-					canMove = false;
-					playerList [currentPlayerIndex].rollDiceDone = true;
-					playerList [currentPlayerIndex].currentBuildingIndex = blockTargetMove;
+			if(turnIndex >= 1) {
+				turnIndex = 0;
+				turn += 1;
+			}
+			
+			// Randomize the stocks of every building every 2 turns
+			if(turn % 2 == 0){
+				foreach(Building x in buildingList){
+					x.StockRandomChange();
 				}
 			}
 		}
@@ -185,25 +256,29 @@ public class GameManager : MonoBehaviour {
 
 		// Transition to sell state
 		if (player.buyDone) {
+			Debug.Log("Buy Done");
 			showBuyMenu = false;
 			player.buyDone = false;
 			player.playerState = Player.State.SELLMENU;
-			return;
 		}
 	}
 
 	public void BuyButton(){
-		if (showBuyMenu) {
-			if(playerList [currentPlayerIndex].BuyStock ()){
-				playerList [currentPlayerIndex].buyDone = true;
+		Player player = playerList [currentPlayerIndex];
+		if (showBuyMenu && player.buyDone == false && player.playerState == Player.State.BUYMENU) {
+			if(player.BuyStock ()){
+				player.buyDone = true;
+				showBuyMenu = false;
 			}
 		}
 	}
 
 	public void BorrowButton(){
-		if (showBuyMenu) {
-			if(playerList [currentPlayerIndex].BorrowStock ()){
-				playerList [currentPlayerIndex].buyDone = true;
+		Player player = playerList [currentPlayerIndex];
+		if (showBuyMenu && player.buyDone == false && player.playerState == Player.State.BUYMENU) {
+			if(player.BorrowStock ()){
+				player.buyDone = true;
+				showBuyMenu = false;
 			}
 		}
 	}
@@ -230,12 +305,16 @@ public class GameManager : MonoBehaviour {
 
 	// UI Button Function to get out of idle state
 	public void RollDice(){
-		playerList [currentPlayerIndex].idleDone = true;
+		if (playerList [currentPlayerIndex].playerState == Player.State.IDLE) {
+			playerList [currentPlayerIndex].idleDone = true;
+		}
 	}
 
 	public void OpenMarket(){
-		GetComponent<MarketButtonScript> ().OpenUI ();
-		showSellMenu = true;
+		if (playerList [currentPlayerIndex].playerState == Player.State.SELLMENU) {
+			GetComponent<MarketButtonScript> ().OpenUI ();
+			showSellMenu = true;
+		}
 	}
 
 	public void CloseMarket(){
@@ -243,6 +322,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void EndTurn(){
-		playerList [currentPlayerIndex].sellDone = true;
+		if (playerList [currentPlayerIndex].playerState == Player.State.SELLMENU) {
+			playerList [currentPlayerIndex].sellDone = true;
+		}
 	}
 }

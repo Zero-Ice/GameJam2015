@@ -29,7 +29,7 @@ public class Player {
 
 	public int currentBuildingIndex;
 	
-	Building currentBuilding;
+	public Building currentBuilding;
 
 	// Use this for initialization
 	void Start () {
@@ -63,7 +63,7 @@ public class Player {
 
 	public void End(){
 		playerState = State.IDLE;
-		turn = done = idleDone = buyDone = rollDiceDone = isJailed = false;
+		turn = done = idleDone = buyDone = sellDone = rollDiceDone = isJailed = false;
 	}
 
 	public void UpdateTurn() {
@@ -75,7 +75,6 @@ public class Player {
 			RunRollDice();
 			break;
 		case State.BUYMENU:
-			buyDone = false;
 			manager.RunBuyMenu();
 			break;
 		case State.SELLMENU:
@@ -100,7 +99,7 @@ public class Player {
 		int diceroll1 = Random.Range (1, 7);
 		int diceroll2 = Random.Range (1, 7);
 
-		// To Do: Link Jailbreak UI, pay or roll double to escape
+			Debug.Log("Dice roll");
 
 		// If player is jailed, check for same dice roll
 		if (isJailed) {
@@ -110,24 +109,40 @@ public class Player {
 				rollDiceDone = true;
 			}
 		}
+
 		int diceResults = diceroll1 + diceroll2;
 		
 		// If player is not jailed, move the player
 		if (!isJailed) {
 			manager.prevIndex = currentBuildingIndex;
+
 			manager.timerPerUnit = (float)(1f/diceResults);
 			manager.timeMoveLeft = (float)(1f/diceResults);
-			manager.blockTargetMove = diceResults;
+
+			// Initial target 
+			manager.blockTargetMove = currentBuildingIndex + 1;
+			if(manager.blockTargetMove > 29){
+					manager.blockTargetMove -= 30;
+				}
+
+			// Final target
+			manager.blockFinalTarget = diceResults + currentBuildingIndex;
+			if(manager.blockFinalTarget > 29){
+					manager.blockFinalTarget -= 30;
+			}
+				Debug.Log(manager.blockFinalTarget.ToString());
 			manager.diceResult = diceResults;
-			manager.blocksLeftToMove = currentBuildingIndex;
+			
+			//manager.blocksLeftToMove = currentBuildingIndex;
+
 			manager.canMove = true;
 
 			currentBuilding = manager.buildingList [currentBuildingIndex];
 			
 			// switch for building that player lands on
 			// Execute only once
-			currentBuilding.Execute (this);
-		}
+			//currentBuilding.Execute (this);
+			}
 		}
 	}
 
