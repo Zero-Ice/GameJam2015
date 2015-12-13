@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour {
 
 	public int prevIndex, blockTargetMove, blockFinalTarget, blocksLeftToMove, diceResult;
 	public float timerPerUnit, timeMoveLeft;
-	public bool canMove;
+	public bool canMove, diceRolling;
 
 
 
@@ -39,7 +39,7 @@ public class GameManager : MonoBehaviour {
 		currentPlayerIndex = 0;
 		noPlayers = 2;
 
-		canMove = false;
+		canMove = diceRolling = false;
 		timeMoveLeft = 5;
 
 		buildingList = new List<Building> ();
@@ -301,6 +301,15 @@ public class GameManager : MonoBehaviour {
 		if (player.sellDone) {
 			player.done = true;
 		}
+	}
+
+	public void DiceRollAnim(int dice1, int dice2)
+	{
+		GameObject temp = Instantiate (Resources.Load ("Dice"), new Vector3 (70, 22, 5), Quaternion.identity) as GameObject;
+		temp.GetComponent<Dice> ().diceResult = dice1;
+		GameObject temp2 = Instantiate (Resources.Load ("Dice"), new Vector3 (73, 22, 5), Quaternion.identity) as GameObject;
+		temp2.GetComponent<Dice> ().diceResult = dice2;
+		diceRolling = true;
 	}
 
 	// UI Button Function to get out of idle state

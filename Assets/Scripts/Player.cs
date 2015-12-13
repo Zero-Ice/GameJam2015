@@ -93,55 +93,58 @@ public class Player {
 
 	// Wait for dice to roll finish and check which block player lands on
 	void RunRollDice(){
-		if (!manager.canMove)
-		{
-		// To Do: Link Dice UI
-		int diceroll1 = Random.Range (1, 7);
-		int diceroll2 = Random.Range (1, 7);
+		if (!manager.diceRolling) {
+			if (!manager.canMove) {
+				// To Do: Link Dice UI
 
-			Debug.Log("Dice roll");
+				int diceroll1 = Random.Range (1, 7);
+				int diceroll2 = Random.Range (1, 7);
 
-		// If player is jailed, check for same dice roll
-		if (isJailed) {
-			if(diceroll1 == diceroll2){
-				isJailed = false;
-			} else {
-				rollDiceDone = true;
-			}
-		}
+				manager.DiceRollAnim (diceroll1, diceroll2);
 
-		int diceResults = diceroll1 + diceroll2;
-		
-		// If player is not jailed, move the player
-		if (!isJailed) {
-			manager.prevIndex = currentBuildingIndex;
-
-			manager.timerPerUnit = (float)(1f/diceResults);
-			manager.timeMoveLeft = (float)(1f/diceResults);
-
-			// Initial target 
-			manager.blockTargetMove = currentBuildingIndex + 1;
-			if(manager.blockTargetMove > 29){
-					manager.blockTargetMove -= 30;
+				// If player is jailed, check for same dice roll
+				if (isJailed) {
+					if (diceroll1 == diceroll2) {
+						isJailed = false;
+					} else {
+						rollDiceDone = true;
+					}
 				}
 
-			// Final target
-			manager.blockFinalTarget = diceResults + currentBuildingIndex;
-			if(manager.blockFinalTarget > 29){
-					manager.blockFinalTarget -= 30;
-			}
-				Debug.Log(manager.blockFinalTarget.ToString());
-			manager.diceResult = diceResults;
-			
-			//manager.blocksLeftToMove = currentBuildingIndex;
+				int diceResults = diceroll1 + diceroll2;
+				manager.diceResult = diceroll1 + diceroll2;
+		
+				// If player is not jailed, move the player
+				if (!isJailed) {
+					manager.prevIndex = currentBuildingIndex;
 
-			manager.canMove = true;
+					manager.timerPerUnit = (float)(1f / diceResults);
+					manager.timeMoveLeft = (float)(1f / diceResults);
 
-			currentBuilding = manager.buildingList [currentBuildingIndex];
+					// Initial target 
+					manager.blockTargetMove = currentBuildingIndex + 1;
+					if (manager.blockTargetMove > 29) {
+						manager.blockTargetMove -= 30;
+					}
+
+					// Final target
+					manager.blockFinalTarget = diceResults + currentBuildingIndex;
+					if (manager.blockFinalTarget > 29) {
+						manager.blockFinalTarget -= 30;
+					}
+					Debug.Log (manager.blockFinalTarget.ToString ());
+					manager.diceResult = diceResults;
 			
-			// switch for building that player lands on
-			// Execute only once
-			//currentBuilding.Execute (this);
+					//manager.blocksLeftToMove = currentBuildingIndex;
+
+					//manager.canMove = true;
+
+					currentBuilding = manager.buildingList [currentBuildingIndex];
+			
+					// switch for building that player lands on
+					// Execute only once
+					//currentBuilding.Execute (this);
+				}
 			}
 		}
 	}
@@ -282,10 +285,6 @@ public class Debt {
 		else {
 			return false;
 		}
-	}
-	
-	void Start() {
-		
 	}
 	
 }
