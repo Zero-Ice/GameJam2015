@@ -107,15 +107,16 @@ public class Player {
 					if (diceroll1 == diceroll2) {
 						isJailed = false;
 					} else {
-						rollDiceDone = true;
+						isJailed = true;
+						manager.canMove = false;
 					}
 				}
 
-				int diceResults = diceroll1 + diceroll2;
-				manager.diceResult = diceroll1 + diceroll2;
-		
 				// If player is not jailed, move the player
 				if (!isJailed) {
+					int diceResults = diceroll1 + diceroll2;
+					manager.diceResult = diceroll1 + diceroll2;
+
 					manager.prevIndex = currentBuildingIndex;
 
 					manager.timerPerUnit = (float)(1f / diceResults);
@@ -135,15 +136,12 @@ public class Player {
 					Debug.Log (manager.blockFinalTarget.ToString ());
 					manager.diceResult = diceResults;
 			
-					//manager.blocksLeftToMove = currentBuildingIndex;
-
-					//manager.canMove = true;
-
 					currentBuilding = manager.buildingList [currentBuildingIndex];
 			
-					// switch for building that player lands on
-					// Execute only once
-					//currentBuilding.Execute (this);
+				} else {
+					manager.blockTargetMove = currentBuildingIndex;
+					manager.blockFinalTarget = currentBuildingIndex;
+					currentBuilding = manager.buildingList [currentBuildingIndex];
 				}
 			}
 		}
